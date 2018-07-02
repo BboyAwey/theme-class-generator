@@ -1,0 +1,18 @@
+{
+  "name": "theme-class-generator",
+  "version": "1.0.0",
+  "description": "A function which can generate theme style classes from a simple config",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "theme",
+    "css",
+    "style",
+    "class-generator",
+    "style-generator"
+  ],
+  "author": "https://github.com/BboyAwey",
+  "license": "MIT"
+}
