@@ -11,16 +11,10 @@
   }
 }(this, function () {
   var defaultThemeConfig = {
-    colors: {
-      'primary': '#1c86e2',
-      'info': '#68217a',
-      'warning': '#f5ae08',
-      'danger': '#ea3a46',
-      'success': '#0cb470',
-    },
+    colors: {},
     shadows: {},
     radiuses: {
-      'small': '2px',
+      'small': '3px',
       'large': '5px'
     }
   }
@@ -42,7 +36,7 @@
 
   function generate (names, valueName, value, prefix) {
     prefix = prefix ? prefix + '-' : ''
-    let res = ''
+    var res = ''
     for (var i = 0; i < names.length; i++) {
       res += '.' + prefix + names[i] + '--' + valueName + '{' + names[i] + ':' + value + '}'
       res += '.' + prefix + names[i] + '--' + valueName + '-important{' + names[i] + ':' + value + '!important}'
@@ -97,6 +91,29 @@
     return JSON.parse(JSON.stringify(obj))
   }
 
+  function isValidHex (hex, ignoreWarning) {
+    var res = !(typeof hex !== 'string' || hex[0] !== '#' || (hex.length !== 4 && hex.length !== 7))
+    if (!res && !ignoreWarning) console.error('Theme class generator @ hex2rgb: invalid hex format "' + hex + '"')
+    return res
+  }
+
+  function isValidShadow (shadow) {
+    if (!shadow) return false
+    var arr = shadow.split(/\s+/)
+    // 0px 0px 2px #f63
+    for (var i = 0; i < arr.length - 1; i++) {
+      if (!/^\d+px$/g.test(arr[i])) {
+        console.error('Theme class generator @ hex2rgb: invalid shadow format "' + shadow + '"')
+        return false
+      }
+    }
+    if (!isValidHex(arr[3], true)) {
+      console.error('Theme class generator @ hex2rgb: invalid shadow format "' + shadow + '"')
+      return false
+    }
+    return true
+  }
+
   /**
   * hex to HSL.
   *
@@ -106,9 +123,7 @@
   *   return an array which each element in it  stands for r, g and b
   */
   function hex2rgb (hex) {
-    if (typeof hex !== 'string' || hex[0] !== '#' || (hex.length !== 4 && hex.length !== 7)) {
-      console.error('Theme class generator @ hex2rgb: invalid hex format "' + hex + '"')
-    } else {
+    if (isValidHex(hex)) {
       var res = []
       hex = hex.substring(1).toLowerCase()
 
@@ -171,6 +186,12 @@
     return rgb2hsl(hex2rgb(hex))
   }
   
+  function getSpecifiedColorValue (hex) {
+    if (hex && isValidHex(hex)) {
+      return hex
+    }
+  }
+
   return function (config) {
     config = config || {}
     var theme = config.theme || {}
@@ -183,36 +204,35 @@
     var baseShadowOpacity = config.baseShadowOpacity || (config.baseShadowOpacity === 0 ? 0 : 0.2)
     var colorShadowOpacity = config.colorShadowOpacity || (config.colorShadowOpacity === 0 ? 0 : 0.6)
 
-    var finalConfig = simpleClone(defaultThemeConfig)
+    var finalTheme = simpleClone(defaultThemeConfig)
     if (typeof theme === 'object') {
       for (var name in theme) {
         if (theme[name]) {
           if (typeof theme[name] === 'object') {
-            finalConfig[name] = finalConfig[name] ? finalConfig[name] : {}
-            Object.assign(finalConfig[name], theme[name])
+            finalTheme[name] = finalTheme[name] ? finalTheme[name] : {}
+            Object.assign(finalTheme[name], theme[name])
           } else {
             console.error('Theme class generator @ config.theme.' + name + ' should be an object')
           }
         }
       }
     } else {
-      console.error('Theme class generator @ config should be an object')
+      console.error('Theme class generator @ theme should be an object')
     }
 
-    let res = ''
+    var res = ''
 
     // generate color classes
-    for (var colorName in finalConfig.colors) {
+    for (var colorName in finalTheme.colors) {
       // calculate relative colors
       var direction = lightnessReverse ? -1 : 1
-      colorValue = hex2hsl(finalConfig.colors[colorName])
+      colorValue = hex2hsl(finalTheme.colors[colorName])
       var colorGroup = {}
-      colorGroup[colorName + '-top'] = [colorValue[0], colorValue[1], lightnessReverse ? 100 - colorTopBottom + '' : colorTopBottom + ''],
-      colorGroup[colorName + '-up'] = [colorValue[0], colorValue[1], colorValue[2] - colorUpDown * direction + ''],
+      colorGroup[colorName + '-top'] = getSpecifiedColorValue(colorGroup[colorName + '-top']) || [colorValue[0], colorValue[1], lightnessReverse ? 100 - colorTopBottom + '' : colorTopBottom + ''],
+      colorGroup[colorName + '-up'] = getSpecifiedColorValue(colorGroup[colorName + '-up']) || [colorValue[0], colorValue[1], colorValue[2] - colorUpDown * direction + ''],
       colorGroup[colorName] = colorValue
-      colorGroup[colorName + '-down'] = [colorValue[0], colorValue[1], Number(colorValue[2]) + colorUpDown * direction + ''],
-      colorGroup[colorName + '-bottom'] = [colorValue[0], colorValue[1], !lightnessReverse ? 100 - colorTopBottom + '' : colorTopBottom + '']
-      console.info(colorName, colorValue, colorGroup)
+      colorGroup[colorName + '-down'] = getSpecifiedColorValue(colorGroup[colorName + '-down']) || [colorValue[0], colorValue[1], Number(colorValue[2]) + colorUpDown * direction + ''],
+      colorGroup[colorName + '-bottom'] = getSpecifiedColorValue(colorGroup[colorName + '-bottom']) || [colorValue[0], colorValue[1], !lightnessReverse ? 100 - colorTopBottom + '' : colorTopBottom + '']
 
       for (var name in colorGroup) {
         var value = colorGroup[name].map(function (e) { return e })
@@ -227,7 +247,9 @@
       }
 
       // generate shadow classes
-      res += genShadowClasses(colorName, '0 0px 4px hsla(' + [colorValue[0], colorValue[1] + '%', colorValue[2] + '%'].join(',') + ',' + colorShadowOpacity + ')', prefix)
+      res += isValidShadow(finalTheme.shadows[colorName])
+        ? genShadowClasses(colorName, finalTheme.shadows[colorName], prefix)
+        : genShadowClasses(colorName, '0 0px 4px hsla(' + [colorValue[0], colorValue[1] + '%', colorValue[2] + '%'].join(',') + ',' + colorShadowOpacity + ')', prefix)
 
       // calculate non-colors
       if (colorName === 'primary') {
@@ -239,15 +261,28 @@
           )
 
           // generate base shadow classes
-          res += genShadowClasses('base', '0 0px 4px hsla(' + [colorValue[0], '0%', '0%'].join(',') + ',' + baseShadowOpacity + ')', prefix)
+          res += isValidShadow(finalTheme.shadows.base)
+            ? finalTheme.shadows.base
+            : genShadowClasses('base', '0 0px 4px hsla(' + [colorValue[0], '0%', '0%'].join(',') + ',' + baseShadowOpacity + ')', prefix)
         }
       }
     }
     
-    // 
+    // generate custom shadow classes
+    for (var shadowName in finalTheme.shadows) {
+      if (finalTheme.colors[shadowName] || shadowName === 'base') continue
+      if (isValidShadow(finalTheme.shadows[shadowName])) {
+        res += genShadowClasses(shadowName, finalTheme.shadows[shadowName], prefix)
+      }
+    }
+
     // generate border-radius classes
-    for (let radiusName in finalConfig.radiuses) {
-      res += genRadiusClasses(radiusName, finalConfig.radiuses[radiusName], prefix)
+    for (var radiusName in finalTheme.radiuses) {
+      if (!/^\d+px$/.test(finalTheme.radiuses[radiusName])) {
+        console.error('Theme class generator @ hex2rgb: invalid radius format "' + finalTheme.radiuses[radiusName] + '"')
+        continue
+      }
+      res += genRadiusClasses(radiusName, finalTheme.radiuses[radiusName], prefix)
     }
 
     return res

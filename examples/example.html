@@ -65,6 +65,10 @@
     <div class="test-block au-theme-background-color--success-down"></div>
     <div class="test-block au-theme-background-color--success-bottom"></div>
   </div>
+
+  <div class="divide">
+    <div class="test-block au-theme-background-color--custom-color"></div>
+  </div>
   <div class="divide base">
     <div class="test-block au-theme-background-color--base-0"></div>
     <div class="test-block au-theme-background-color--base-1"></div>
@@ -87,6 +91,12 @@
     <div class="test-block shadow au-theme-box-shadow--danger"></div>
     <div class="test-block shadow au-theme-box-shadow--warning"></div>
     <div class="test-block shadow au-theme-box-shadow--success"></div>
+    <div class="test-block shadow au-theme-box-shadow--custom-shadow"></div>
+  </div>
+  <div class="divide">
+    <div class="test-block au-theme-border-radius--small au-theme-background-color--primary"></div>
+    <div class="test-block au-theme-border-radius--large au-theme-background-color--primary"></div>
+    <div class="test-block au-theme-border-radius--huge au-theme-background-color--primary"></div>
   </div>
 </body>
 <script>
@@ -98,6 +108,19 @@
         // danger: '#f17c67',
         // warning: '#e9f01d',
         // success: '#00ff80'
+        'primary': '#1c86e2',
+        'info': '#68217a',
+        'warning': '#f5ae08',
+        'danger': '#ea3a46',
+        'success': '#0cb470',
+        'custom-color': '#f00'
+      },
+      shadows: {
+        primary: '2px 2px 4px #f00',
+        'custom-shadow': '3px 3px 6px #00f'
+      },
+      radiuses: {
+        huge: '10px'
       }
     },
     prefix: 'au-theme',
