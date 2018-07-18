@@ -13,6 +13,14 @@
     "class-generator",
     "style-generator"
   ],
-  "author": "https://github.com/BboyAwey",
+  "author": {
+    "name" : "Bboy Away",
+    "email" : "bboyawey@sina.cn",
+    "url" : "https://github.com/BboyAwey"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "git@github.com:BboyAwey/theme-class-generator.git"
+  },
   "license": "MIT"
 }
