@@ -54,10 +54,10 @@
     res += generate(['color'], colorName, colorNumber, prefix)
 
     // generate placeholder color classes
-    res += '.' + prefix + 'placeholder-color--' + colorName + '::-webkit-input-placeholder{color:' + colorNumber + '}'
-    res += '.' + prefix + 'placeholder-color--' + colorName + ':-moz-placeholder{color:' + colorNumber + '}'
-    res += '.' + prefix + 'placeholder-color--' + colorName + '::-moz-placeholder{color:' + colorNumber + '}'
-    res += '.' + prefix + 'placeholder-color--' + colorName + ':-ms-input-placeholder{color:' + colorNumber + '}'
+    res += '.' + prefix + '-placeholder-color--' + colorName + '::-webkit-input-placeholder{color:' + colorNumber + '}'
+    res += '.' + prefix + '-placeholder-color--' + colorName + ':-moz-placeholder{color:' + colorNumber + '}'
+    res += '.' + prefix + '-placeholder-color--' + colorName + '::-moz-placeholder{color:' + colorNumber + '}'
+    res += '.' + prefix + '-placeholder-color--' + colorName + ':-ms-input-placeholder{color:' + colorNumber + '}'
     
     // generate border color classes
     res += generate([
