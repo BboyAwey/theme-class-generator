@@ -1,6 +1,6 @@
 {
   "name": "theme-class-generator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A function which can generate theme style classes from a simple config",
   "main": "index.js",
   "scripts": {
